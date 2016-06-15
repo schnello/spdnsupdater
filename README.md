@@ -13,3 +13,4 @@ Execute the script without any special parameter: bash spdnsupdater.sh
 3.	Check if the ip was changed (since the last run)
 4.	Checks when the last update was done (atm after 24h the script force the ip update).
 5.	Save “lastip” and “lastcheck” to /tmp/lastip
+6.	Perform the ip update (if the ip was changed or the last check is older as 24h
