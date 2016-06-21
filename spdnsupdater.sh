@@ -13,7 +13,7 @@ fi
 
 #get current ip
 IP=$(curl -s http://checkip4.spdyn.de/)
-echo "Current IP is $IP"
+echo "current IP is $IP"
 
 
 
@@ -34,23 +34,42 @@ RETURNCODE=$(curl -s --user $1:$2 "https://update.spdyn.de/nic/update?hostname=$
 
 
 # eval return code
-# if construct should be changed to case
 
-if [ $(grep -c "nochg" <<< "$RETURNCODE") = 0 ] && [ $(grep -c "good" <<< "$RETURNCODE") = 0 ];then
-	echo "update failed"
-	echo "Error Code: $RETURNCODE"
-else
-	if [ $(grep -c "nochg" <<< "$RETURNCODE") -ge 1 ];then
-		echo "update done... but no update was necessary"
-	fi
+case $RETURNCODE in
 
-	if [ $(grep -c "good" <<< "$RETURNCODE") -ge 1 ];then
-		echo "update done... IP changed to $IP"
-	fi
-fi
+	nochg*)
+	echo "update done... IP was up2date"
+	;;
 
+	good*)
+	echo "update done... IP changed to $IP"
+	;;
+
+	abuse*)
+	echo "update failed: abuse error"
+	;;
+
+	badauth*)
+	echo "update failed: wrong user or password"
+	;;
+
+	numhost*)
+	echo "update failed: you try to update more as 20 hosts"
+	;;
+
+	notfqdn*)
+	echo "update failed: host is not a FQDN"
+	;;
+
+	!yours*)
+	echo "update failed: host is not assigned to your account"
+	;;
+
+esac
 
 }
+
+
 
 # load domains and passwords from spdnsupdater.conf
 if [ -f ~/.spdnsupdater.conf ];then
