@@ -36,7 +36,7 @@ RETURNCODE=$(curl -s --user $1:$2 "https://update.spdyn.de/nic/update?hostname=$
 # eval return code
 # if construct should be changed to case
 
-if [ $(grep -c "nochg" <<< "$RETURNCODE") = 0 ] || [ $(grep -c "good" <<< "$RETURNCODE") = 0 ];then
+if [ $(grep -c "nochg" <<< "$RETURNCODE") = 0 ] && [ $(grep -c "good" <<< "$RETURNCODE") = 0 ];then
 	echo "update failed"
 	echo "Error Code: $RETURNCODE"
 else
