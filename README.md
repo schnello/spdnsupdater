@@ -3,12 +3,12 @@ This bash script is to be used for the Securepoint Dynamic DNS Service (https://
 
 ### How to use?
 Add your domain and password under `~/.spdnsupdater.conf`
-
 Example:
 ```
 DOMAIN=(dmxxxx.spdns.eu dyxxxx.spdns.eu qxxxx.spdns.eu upxxxx.spdns.eu)
 PASSWORD=(ieya-xxxxx qsto-xxxxxx mnuq-xxxxx zfoy-xxxxx)
 ```
+Run the script `bash spdnsupdater.sh`
 
 ### How it works?
 1.	Load “lastip” and “lastcheck” from /tmp/lastip (if available)
