@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# get IP
+# load last IP
 LASTIP=0.0.0.0
 
 if [ -f /tmp/lastip ];then
@@ -27,13 +27,29 @@ if [ "$IP" = "$LASTIP" ];then
 	fi
 fi
 
-
-echo "LASTIP=$IP" > /tmp/lastip
-echo "LASTCHECK=$(date +%s)" >> /tmp/lastip
-
 #update string
 updateip(){
-curl --user $1:$2 "https://update.spdyn.de/nic/update?hostname=$1&myip=$IP&pass=$2"
+RETURNCODE=$(curl -s --user $1:$2 "https://update.spdyn.de/nic/update?hostname=$1&myip=$IP&pass=$2")
+
+
+
+# eval return code
+# if construct should be changed to case
+
+if [ $(grep -c "nochg" <<< "$RETURNCODE") = 0 ] || $(grep -c "good" <<< "$RETURNCODE") = 0 ];then
+	echo "update failed"
+	echo "Error Code: $RETURNCODE"
+else
+	if [ $(grep -c "nochg" <<< "$RETURNCODE") -ge 1 ];then
+		echo "update done... but no update was necessary"
+	fi
+
+	if [ $(grep -c "good" <<< "$RETURNCODE") -ge 1 ];then
+		echo "update done... IP changed to $IP"
+	fi
+fi
+
+
 }
 
 # load domains and passwords from spdnsupdater.conf
@@ -48,6 +64,8 @@ fi
 # cal end for sequence
 e=$(( $(echo ${DOMAIN[*]} | wc -w) - 1 )) 
 
+echo "LASTIP=$IP" > /tmp/lastip
+echo "LASTCHECK=$(date +%s)" >> /tmp/lastip
 
 #perform update
 for (( i=0; i<=$e; i++ ));do
