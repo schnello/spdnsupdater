@@ -76,11 +76,11 @@ if [ -f ~/.spdnsupdater.conf ];then
 	echo "import config from ~/.spdnsupdater.conf "
 	source ~/.spdnsupdater.conf 
 else
-	echo "conf file not found"
+	echo "conf file \"$HOME/.spdnsupdater.conf\" not found"
 	exit
 fi
 
-# cal end for sequence
+# calc end for sequence
 e=$(( $(echo ${DOMAIN[*]} | wc -w) - 1 )) 
 
 echo "LASTIP=$IP" > /tmp/lastip
