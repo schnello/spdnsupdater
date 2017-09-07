@@ -61,9 +61,14 @@ case $RETURNCODE in
 	echo "update failed: host is not a FQDN"
 	;;
 
-	!yours*)
+	yours*)
 	echo "update failed: host is not assigned to your account"
 	;;
+
+	fatal*)
+	echo "update failed: fatal error"
+	;;
+
 
 esac
 
