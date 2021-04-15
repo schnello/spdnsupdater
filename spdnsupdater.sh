@@ -19,7 +19,7 @@ echo "current IP is $IP"
 
 #check ip and last check
 if [ "$IP" = "$LASTIP" ];then
-	if [ "$LASTCHECK" -le "$(( $(date +%s) - 86400 ))" ];then
+	if [ "$LASTCHECK" -le "$(( $(date +%s) - 10800 ))" ];then
 		echo "force ip update"
 	else
 	echo "no ip change"
@@ -30,7 +30,6 @@ fi
 #update string
 updateip(){
 RETURNCODE=$(curl -s --user $1:$2 "https://update.spdyn.de/nic/update?hostname=$1&myip=$IP&pass=$2")
-
 
 
 # eval return code
@@ -46,31 +45,38 @@ case $RETURNCODE in
 	;;
 
 	abuse*)
-	echo "update failed: abuse error"
+	>&2 echo "update failed: abuse error"
+	exit
 	;;
 
 	badauth*)
-	echo "update failed: wrong user or password"
+	>&2 echo "update failed: wrong user or password"
+	exit
 	;;
 
 	numhost*)
-	echo "update failed: you try to update more as 20 hosts"
+	>&2 echo "update failed: you try to update more as 20 hosts"
+	exit
 	;;
 
 	notfqdn*)
-	echo "update failed: host is not a FQDN"
+	>&2 echo "update failed: host is not a FQDN"
+	exit
 	;;
 
 	!yours*)
-	echo "update failed: host is not assigned to your account"
+	>&2 echo "update failed: host is not assigned to your account"
+	exit
 	;;
 
 	fatal*)
-	echo "update failed: host is disabled"
+	>&2 echo "update failed: host is disabled"
+	exit
 	;;
 
 	nohost*)
-	echo "update failed: host not available or deleted"
+	>&2 echo "update failed: host not available or deleted"
+	exit
 	;;
 
 
@@ -92,8 +98,6 @@ fi
 # calc end for sequence
 e=$(( $(echo ${DOMAIN[*]} | wc -w) - 1 )) 
 
-echo "LASTIP=$IP" > /tmp/lastip
-echo "LASTCHECK=$(date +%s)" >> /tmp/lastip
 
 #perform update
 for (( i=0; i<=$e; i++ ));do
@@ -102,6 +106,8 @@ for (( i=0; i<=$e; i++ ));do
 	updateip ${DOMAIN[$i]} ${PASSWORD[$i]}
 	echo " "
 done
+echo "LASTIP=$IP" > /tmp/lastip
+echo "LASTCHECK=$(date +%s)" >> /tmp/lastip
 
 
 
